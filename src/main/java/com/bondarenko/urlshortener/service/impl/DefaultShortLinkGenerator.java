@@ -8,28 +8,36 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultShortLinkGenerator implements ShortLinkGenerator {
 
-    private static final int INDEX_FIRST = 0;
-    private static final int INDEX_LAST = 5;
-    private static int INDEX = 0;
+    private static final int LIMIT_LOWER = 0;
+    private static final int LIMIT_UPPER = 5;
     private final ShortLinkMapper shortLinkMapper;
+    private int index = 0;
 
     @Override
     public ShortLinkResponse generateShortLink() {
         log.info("Start generate short link");
-        String symbols = ShortLinkUtil.getSymbolsForShortLinkGeneration();
-        StringBuilder shortLinkBuilder = new StringBuilder();
+        String symbolsForGeneration = ShortLinkUtil.getSymbolsForShortLinkGeneration();
 
-        long currentIndex = INDEX++;
-        for (int i = INDEX_FIRST; i < INDEX_LAST; i++) {
-            long symbolIndex = currentIndex % symbols.length();
-            shortLinkBuilder.insert(0, symbols.charAt((int) symbolIndex));
-            currentIndex /= symbols.length();
-        }
-        return shortLinkMapper.toShortLinkResponse(shortLinkBuilder.toString());
+        String shortLink = IntStream.range(LIMIT_LOWER, LIMIT_UPPER)
+                .mapToObj(i -> findIndexValue(symbolsForGeneration, i))
+                .map(String::valueOf)
+                .collect(Collectors.joining());
+        index++;
+        log.info("Short link was generated: {}", shortLink);
+
+        return shortLinkMapper.toShortLinkResponse(shortLink);
+    }
+
+    private char findIndexValue(String symbols, int i) {
+        double valuePosition = index / Math.pow(symbols.length(), i) % symbols.length();
+        return symbols.charAt((int) valuePosition);
     }
 }
