@@ -5,8 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ShortLinkMapperTest {
 
@@ -21,5 +20,14 @@ public class ShortLinkMapperTest {
 
         assertNotNull(shortLinkResponse);
         assertEquals(shortLink, shortLinkResponse.getShortLink());
+    }
+
+    @Test
+    @DisplayName("should map to short link response with empty link successfully")
+    void shouldMapToShortLinkResponseWithEmptyLinkSuccessfully() {
+
+        ShortLinkResponse shortLinkResponse = shortLinkMapper.toShortLinkResponse(null);
+
+        assertNull(shortLinkResponse);
     }
 }

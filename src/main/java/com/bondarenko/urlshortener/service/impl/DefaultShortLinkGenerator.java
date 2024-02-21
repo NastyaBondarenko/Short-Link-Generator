@@ -19,25 +19,32 @@ public class DefaultShortLinkGenerator implements ShortLinkGenerator {
     private static final int LIMIT_LOWER = 0;
     private static final int LIMIT_UPPER = 5;
     private final ShortLinkMapper shortLinkMapper;
-    private int index = 0;
+    private int currentIndex = 0;
 
     @Override
     public ShortLinkResponse generateShortLink() {
-        log.info("Start generate short link");
+
         String symbolsForGeneration = ShortLinkUtil.getSymbolsForShortLinkGeneration();
+        validateIndex(symbolsForGeneration);
 
         String shortLink = IntStream.range(LIMIT_LOWER, LIMIT_UPPER)
                 .mapToObj(i -> findIndexValue(symbolsForGeneration, i))
                 .map(String::valueOf)
                 .collect(Collectors.joining());
-        index++;
-        log.info("Short link was generated: {}", shortLink);
+        currentIndex++;
 
         return shortLinkMapper.toShortLinkResponse(shortLink);
     }
 
-    private char findIndexValue(String symbols, int i) {
-        double valuePosition = index / Math.pow(symbols.length(), i) % symbols.length();
-        return symbols.charAt((int) valuePosition);
+    private char findIndexValue(String symbolsForGeneration, int i) {
+        double indexMaxCombinations = Math.pow(symbolsForGeneration.length(), i);
+        double valueSegment = currentIndex / indexMaxCombinations;
+        double valuePosition = valueSegment % symbolsForGeneration.length();
+        return symbolsForGeneration.charAt((int) valuePosition);
+    }
+
+    private void validateIndex(String symbolsForGeneration) {
+        double maxCombinationsCount = Math.pow(symbolsForGeneration.length(), LIMIT_UPPER);
+        currentIndex = currentIndex >= maxCombinationsCount ? 0 : currentIndex;
     }
 }
