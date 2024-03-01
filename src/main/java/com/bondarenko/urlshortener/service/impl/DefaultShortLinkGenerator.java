@@ -11,24 +11,24 @@ import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.bondarenko.urlshortener.util.ShortLinkUtil.LINK_LIMIT_LOWER;
+import static com.bondarenko.urlshortener.util.ShortLinkUtil.LINK_LIMIT_UPPER;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultShortLinkGenerator implements ShortLinkGenerator {
-
-    private static final int LIMIT_LOWER = 0;
-    private static final int LIMIT_UPPER = 5;
     private final ShortLinkMapper shortLinkMapper;
     private int currentIndex = 0;
 
     @Override
     public ShortLinkResponse generateShortLink() {
 
-        String symbolsForGeneration = ShortLinkUtil.getSymbolsForShortLinkGeneration();
-        validateIndex(symbolsForGeneration);
+        String linkGenerationSymbols = ShortLinkUtil.getSymbolsForShortLinkGeneration();
+        validateIndex(linkGenerationSymbols);
 
-        String shortLink = IntStream.range(LIMIT_LOWER, LIMIT_UPPER)
-                .mapToObj(i -> findIndexValue(symbolsForGeneration, i))
+        String shortLink = IntStream.range(LINK_LIMIT_LOWER, LINK_LIMIT_UPPER)
+                .mapToObj(i -> findIndexValue(linkGenerationSymbols, i))
                 .map(String::valueOf)
                 .collect(Collectors.joining());
         currentIndex++;
@@ -44,7 +44,7 @@ public class DefaultShortLinkGenerator implements ShortLinkGenerator {
     }
 
     private void validateIndex(String symbolsForGeneration) {
-        double maxCombinationsCount = Math.pow(symbolsForGeneration.length(), LIMIT_UPPER);
-        currentIndex = currentIndex >= maxCombinationsCount ? 0 : currentIndex;
+        double maxLinkCombinations = Math.pow(symbolsForGeneration.length(), LINK_LIMIT_UPPER);
+        currentIndex = currentIndex >= maxLinkCombinations ? 0 : currentIndex;
     }
 }

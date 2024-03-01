@@ -24,36 +24,36 @@ public class DefaultShortLinkGeneratorTest {
             actualShortLink[i] = shortLinkGenerator.generateShortLink();
         }
 
-        assertEquals("00000", actualShortLink[0].getShortLink());
-        assertEquals("10000", actualShortLink[1].getShortLink());
-        assertEquals("20000", actualShortLink[2].getShortLink());
+        assertEquals("0000", actualShortLink[0].getShortLink());
+        assertEquals("1000", actualShortLink[1].getShortLink());
+        assertEquals("2000", actualShortLink[2].getShortLink());
 
-        assertEquals("a0000", actualShortLink[10].getShortLink());
-        assertEquals("b0000", actualShortLink[11].getShortLink());
-        assertEquals("c0000", actualShortLink[12].getShortLink());
+        assertEquals("a000", actualShortLink[10].getShortLink());
+        assertEquals("b000", actualShortLink[11].getShortLink());
+        assertEquals("c000", actualShortLink[12].getShortLink());
 
-        assertEquals("A0000", actualShortLink[36].getShortLink());
-        assertEquals("B0000", actualShortLink[37].getShortLink());
-        assertEquals("C0000", actualShortLink[38].getShortLink());
+        assertEquals("A000", actualShortLink[36].getShortLink());
+        assertEquals("B000", actualShortLink[37].getShortLink());
+        assertEquals("C000", actualShortLink[38].getShortLink());
 
-        assertEquals("01000", actualShortLink[62].getShortLink());
-        assertEquals("11000", actualShortLink[63].getShortLink());
-        assertEquals("21000", actualShortLink[64].getShortLink());
+        assertEquals("0100", actualShortLink[62].getShortLink());
+        assertEquals("1100", actualShortLink[63].getShortLink());
+        assertEquals("2100", actualShortLink[64].getShortLink());
 
-        assertEquals("a1000", actualShortLink[72].getShortLink());
-        assertEquals("b1000", actualShortLink[73].getShortLink());
-        assertEquals("c1000", actualShortLink[74].getShortLink());
+        assertEquals("a100", actualShortLink[72].getShortLink());
+        assertEquals("b100", actualShortLink[73].getShortLink());
+        assertEquals("c100", actualShortLink[74].getShortLink());
 
-        assertEquals("A1000", actualShortLink[98].getShortLink());
-        assertEquals("B1000", actualShortLink[99].getShortLink());
-        assertEquals("C1000", actualShortLink[100].getShortLink());
+        assertEquals("A100", actualShortLink[98].getShortLink());
+        assertEquals("B100", actualShortLink[99].getShortLink());
+        assertEquals("C100", actualShortLink[100].getShortLink());
 
-        assertEquals("a2000", actualShortLink[134].getShortLink());
-        assertEquals("b2000", actualShortLink[135].getShortLink());
-        assertEquals("c2000", actualShortLink[136].getShortLink());
+        assertEquals("a200", actualShortLink[134].getShortLink());
+        assertEquals("b200", actualShortLink[135].getShortLink());
+        assertEquals("c200", actualShortLink[136].getShortLink());
 
-        assertEquals("A2000", actualShortLink[160].getShortLink());
-        assertEquals("B2000", actualShortLink[161].getShortLink());
-        assertEquals("C2000", actualShortLink[162].getShortLink());
+        assertEquals("A200", actualShortLink[160].getShortLink());
+        assertEquals("B200", actualShortLink[161].getShortLink());
+        assertEquals("C200", actualShortLink[162].getShortLink());
     }
 }
