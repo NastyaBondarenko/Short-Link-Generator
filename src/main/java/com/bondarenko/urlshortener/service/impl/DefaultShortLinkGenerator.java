@@ -28,7 +28,7 @@ public class DefaultShortLinkGenerator implements ShortLinkGenerator {
         validateIndex(linkGenerationSymbols);
 
         String shortLink = IntStream.range(LINK_LIMIT_LOWER, LINK_LIMIT_UPPER)
-                .mapToObj(i -> findIndexValue(linkGenerationSymbols, i))
+                .mapToObj(index -> findIndexValue(linkGenerationSymbols, index))
                 .map(String::valueOf)
                 .collect(Collectors.joining());
         currentIndex++;
@@ -36,11 +36,11 @@ public class DefaultShortLinkGenerator implements ShortLinkGenerator {
         return shortLinkMapper.toShortLinkResponse(shortLink);
     }
 
-    private char findIndexValue(String symbolsForGeneration, int i) {
-        double indexMaxCombinations = Math.pow(symbolsForGeneration.length(), i);
+    private char findIndexValue(String linkGenerationSymbols, int index) {
+        double indexMaxCombinations = Math.pow(linkGenerationSymbols.length(), index);
         double valueSegment = currentIndex / indexMaxCombinations;
-        double valuePosition = valueSegment % symbolsForGeneration.length();
-        return symbolsForGeneration.charAt((int) valuePosition);
+        double valuePosition = valueSegment % linkGenerationSymbols.length();
+        return linkGenerationSymbols.charAt((int) valuePosition);
     }
 
     private void validateIndex(String symbolsForGeneration) {
