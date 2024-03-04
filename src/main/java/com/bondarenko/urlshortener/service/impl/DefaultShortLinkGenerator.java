@@ -1,50 +1,43 @@
 package com.bondarenko.urlshortener.service.impl;
 
-import com.bondarenko.urlshortener.dto.ShortLinkResponse;
-import com.bondarenko.urlshortener.mapper.ShortLinkMapper;
 import com.bondarenko.urlshortener.service.ShortLinkGenerator;
-import com.bondarenko.urlshortener.util.ShortLinkUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.bondarenko.urlshortener.util.ShortLinkUtil.LINK_LIMIT_LOWER;
-import static com.bondarenko.urlshortener.util.ShortLinkUtil.LINK_LIMIT_UPPER;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultShortLinkGenerator implements ShortLinkGenerator {
-    private final ShortLinkMapper shortLinkMapper;
-    private int currentIndex = 0;
+
+    public static final String LINK_SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public static final int LINK_MAX_COMBINATIONS = 14776336;
+    public static final int LINKS_BATCH_SIZE = 100;
+    public static final int LINK_LIMIT_LOWER = 0;
+    public static final int LINK_LIMIT_UPPER = 4;
+    private AtomicInteger currentIndex = new AtomicInteger(0);
 
     @Override
-    public ShortLinkResponse generateShortLink() {
+    public String generateShortLink() {
+        currentIndex.compareAndSet(LINK_MAX_COMBINATIONS, 0);
+        String shortLink = getGeneratedLink();
+        currentIndex.incrementAndGet();
+        return shortLink;
+    }
 
-        String linkGenerationSymbols = ShortLinkUtil.getSymbolsForShortLinkGeneration();
-        validateIndex(linkGenerationSymbols);
-
-        String shortLink = IntStream.range(LINK_LIMIT_LOWER, LINK_LIMIT_UPPER)
-                .mapToObj(index -> findIndexValue(linkGenerationSymbols, index))
+    private String getGeneratedLink() {
+        return IntStream.range(LINK_LIMIT_LOWER, LINK_LIMIT_UPPER)
+                .mapToObj(this::generateLinkSymbol)
                 .map(String::valueOf)
                 .collect(Collectors.joining());
-        currentIndex++;
-
-        return shortLinkMapper.toShortLinkResponse(shortLink);
     }
 
-    private char findIndexValue(String linkGenerationSymbols, int index) {
-        double indexMaxCombinations = Math.pow(linkGenerationSymbols.length(), index);
-        double valueSegment = currentIndex / indexMaxCombinations;
-        double valuePosition = valueSegment % linkGenerationSymbols.length();
-        return linkGenerationSymbols.charAt((int) valuePosition);
-    }
-
-    private void validateIndex(String symbolsForGeneration) {
-        double maxLinkCombinations = Math.pow(symbolsForGeneration.length(), LINK_LIMIT_UPPER);
-        currentIndex = currentIndex >= maxLinkCombinations ? 0 : currentIndex;
+    private char generateLinkSymbol(int index) {
+        double symbolMaxCombinations = Math.pow(LINK_SYMBOLS.length(), index);
+        double symbolPosition = (currentIndex.get() / symbolMaxCombinations) % LINK_SYMBOLS.length();
+        return LINK_SYMBOLS.charAt((int) symbolPosition);
     }
 }
