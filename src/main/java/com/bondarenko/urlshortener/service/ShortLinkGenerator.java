@@ -1,7 +1,9 @@
 package com.bondarenko.urlshortener.service;
 
+import java.util.List;
+
 public interface ShortLinkGenerator {
 
-    String generateShortLink();
+    List<String> generateShortLink();
 
 }

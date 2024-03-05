@@ -4,6 +4,8 @@ import com.bondarenko.urlshortener.service.ShortLinkGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -21,11 +23,16 @@ public class DefaultShortLinkGenerator implements ShortLinkGenerator {
     private AtomicInteger currentIndex = new AtomicInteger(0);
 
     @Override
-    public String generateShortLink() {
+    public List<String> generateShortLink() {
         currentIndex.compareAndSet(LINK_MAX_COMBINATIONS, 0);
-        String shortLink = getGeneratedLink();
-        currentIndex.incrementAndGet();
-        return shortLink;
+
+        List<String> shortLinks = new ArrayList<>();
+        for (int i = 0; i < LINKS_BATCH_SIZE; i++) {
+            String shortLink = getGeneratedLink();
+            currentIndex.incrementAndGet();
+            shortLinks.add(shortLink);
+        }
+        return shortLinks;
     }
 
     private String getGeneratedLink() {
