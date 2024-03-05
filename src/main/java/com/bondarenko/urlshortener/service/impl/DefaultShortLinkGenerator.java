@@ -1,10 +1,10 @@
 package com.bondarenko.urlshortener.service.impl;
 
 import com.bondarenko.urlshortener.service.ShortLinkGenerator;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -24,25 +24,27 @@ public class DefaultShortLinkGenerator implements ShortLinkGenerator {
 
     @Override
     public List<String> generateShortLink() {
+
         currentIndex.compareAndSet(LINK_MAX_COMBINATIONS, 0);
 
-        List<String> shortLinks = new ArrayList<>();
-        for (int i = 0; i < LINKS_BATCH_SIZE; i++) {
-            String shortLink = getGeneratedLink();
-            currentIndex.incrementAndGet();
-            shortLinks.add(shortLink);
-        }
-        return shortLinks;
+        return IntStream.range(0, LINKS_BATCH_SIZE)
+                .mapToObj(i -> {
+                    String generatedLink = getGeneratedLink();
+                    currentIndex.incrementAndGet();
+                    return generatedLink;
+                }).toList();
     }
 
-    private String getGeneratedLink() {
+    @VisibleForTesting
+    String getGeneratedLink() {
         return IntStream.range(LINK_LIMIT_LOWER, LINK_LIMIT_UPPER)
                 .mapToObj(this::generateLinkSymbol)
                 .map(String::valueOf)
                 .collect(Collectors.joining());
     }
 
-    private char generateLinkSymbol(int index) {
+    @VisibleForTesting
+    char generateLinkSymbol(int index) {
         double symbolMaxCombinations = Math.pow(LINK_SYMBOLS.length(), index);
         double symbolPosition = (currentIndex.get() / symbolMaxCombinations) % LINK_SYMBOLS.length();
         return LINK_SYMBOLS.charAt((int) symbolPosition);
