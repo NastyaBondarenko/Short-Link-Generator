@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ShortLinkController.class)
 public class ShortLinkControllerTest {
 
-    private final List<String> SHORT_LINKS = new ArrayList<>(List.of("0000", "1000", "2000", "3000", "4000"));
+    private final List<String> SHORT_LINKS = new ArrayList<>(List.of("0000", "1000", "2000", "3000", "4000", "5000"));
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -42,7 +42,8 @@ public class ShortLinkControllerTest {
                                 "1000",
                                 "2000",
                                 "3000",
-                                "4000"
+                                "4000",
+                                "5000"
                                 ]
                                 """))
                 .andExpect(status().isOk());
@@ -57,5 +58,16 @@ public class ShortLinkControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/short-link/")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("should return not allowed response when generate short links inappropriate http method")
+    void shouldReturnNotAllowedResponse_WhenGenerateShortLinksWithInappropriateHttpMethod() throws Exception {
+
+        when(shortLinkGenerator.generateShortLink()).thenReturn(SHORT_LINKS);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/short-link/generate")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isMethodNotAllowed());
     }
 }
