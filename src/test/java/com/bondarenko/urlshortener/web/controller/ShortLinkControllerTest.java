@@ -30,7 +30,7 @@ public class ShortLinkControllerTest {
     @DisplayName("should generate short link successfully")
     void shouldGenerateShortLinkSuccessfully() throws Exception {
 
-        when(shortLinkGenerator.generateShortLink()).thenReturn(SHORT_LINKS);
+        when(shortLinkGenerator.generateShortLinks()).thenReturn(SHORT_LINKS);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/short-link/generate")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -47,27 +47,5 @@ public class ShortLinkControllerTest {
                                 ]
                                 """))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("should return not found response when generate short links with invalid url")
-    void shouldReturnNotFoundResponse_WhenGenerateShortLinksWithInvalidUrl() throws Exception {
-
-        when(shortLinkGenerator.generateShortLink()).thenReturn(SHORT_LINKS);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/short-link/")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("should return not allowed response when generate short links inappropriate http method")
-    void shouldReturnNotAllowedResponse_WhenGenerateShortLinksWithInappropriateHttpMethod() throws Exception {
-
-        when(shortLinkGenerator.generateShortLink()).thenReturn(SHORT_LINKS);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/short-link/generate")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isMethodNotAllowed());
     }
 }

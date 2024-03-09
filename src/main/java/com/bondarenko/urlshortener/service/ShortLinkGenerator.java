@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface ShortLinkGenerator {
 
-    List<String> generateShortLink();
+    List<String> generateShortLinks();
 
 }

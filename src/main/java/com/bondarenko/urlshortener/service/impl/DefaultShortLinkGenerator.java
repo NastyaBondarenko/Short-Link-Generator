@@ -2,9 +2,11 @@ package com.bondarenko.urlshortener.service.impl;
 
 import com.bondarenko.urlshortener.service.ShortLinkGenerator;
 import com.google.common.annotations.VisibleForTesting;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -12,41 +14,46 @@ import java.util.stream.IntStream;
 
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class DefaultShortLinkGenerator implements ShortLinkGenerator {
 
-    public static final String LINK_SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    public static final int LINK_MAX_COMBINATIONS = 14776336;
-    public static final int LINKS_BATCH_SIZE = 100;
-    public static final int LINK_LIMIT_LOWER = 0;
-    public static final int LINK_LIMIT_UPPER = 4;
-    private AtomicInteger currentIndex = new AtomicInteger(0);
+    private static final String LINK_SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final int LINK_MAX_COMBINATIONS = 14_776_336;
+    private static final int LINK_LIMIT_LOWER = 0;
+    private static final int LINK_LIMIT_UPPER = 4;
+    private AtomicInteger generatedCombinationsCount;
+    @Value("${links.batch.size}")
+    private int linksBatchSize;
 
     @Override
-    public List<String> generateShortLink() {
+    public List<String> generateShortLinks() {
 
-        currentIndex.compareAndSet(LINK_MAX_COMBINATIONS, 0);
+        generatedCombinationsCount.compareAndSet(LINK_MAX_COMBINATIONS, 0);//refactor
 
-        return IntStream.range(0, LINKS_BATCH_SIZE)
-                .mapToObj(i -> {
-                    String generatedLink = getGeneratedLink();
-                    currentIndex.incrementAndGet();
-                    return generatedLink;
-                }).toList();
+        int startIndex = generatedCombinationsCount.get();
+        generatedCombinationsCount.compareAndSet(startIndex, startIndex + linksBatchSize);
+
+        List<String> result = new ArrayList<>();
+
+        for (int i = 0; i < linksBatchSize; i++) {
+            result.add(getGeneratedLink(startIndex++));
+        }
+
+        return result;
     }
 
     @VisibleForTesting
-    String getGeneratedLink() {
+    String getGeneratedLink(int valueIndex) {
         return IntStream.range(LINK_LIMIT_LOWER, LINK_LIMIT_UPPER)
-                .mapToObj(this::generateLinkSymbol)
+                .mapToObj(symbolIndex -> generateLinkSymbol(symbolIndex, valueIndex))
                 .map(String::valueOf)
                 .collect(Collectors.joining());
     }
 
     @VisibleForTesting
-    char generateLinkSymbol(int index) {
-        double symbolMaxCombinations = Math.pow(LINK_SYMBOLS.length(), index);
-        double symbolPosition = (currentIndex.get() / symbolMaxCombinations) % LINK_SYMBOLS.length();
+    char generateLinkSymbol(int symbolIndex, int valueIndex) {
+        double symbolMaxCombinations = Math.pow(LINK_SYMBOLS.length(), symbolIndex);
+        double symbolPosition = (valueIndex / symbolMaxCombinations) % LINK_SYMBOLS.length();
         return LINK_SYMBOLS.charAt((int) symbolPosition);
     }
 }

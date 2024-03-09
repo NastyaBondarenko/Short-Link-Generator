@@ -19,6 +19,6 @@ public class ShortLinkController {
     @PostMapping("/generate")
     protected List<String> generateShortLink() {
 
-        return shortLinkGenerator.generateShortLink();
+        return shortLinkGenerator.generateShortLinks();
     }
 }
