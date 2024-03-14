@@ -1,6 +1,6 @@
 package com.bondarenko.urlshortener.web.controller;
 
-import com.bondarenko.urlshortener.service.ShortLinkGenerator;
+import com.bondarenko.urlshortener.service.ShortLinksGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,14 +11,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/v1/short-link", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/api/v1/short-links", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ShortLinkController {
 
-    private final ShortLinkGenerator shortLinkGenerator;
+    private final ShortLinksGenerator shortLinkGenerator;
 
     @PostMapping("/generate")
-    protected List<String> generateShortLink() {
-
+    protected List<String> generateShortLinks() {
         return shortLinkGenerator.generateShortLinks();
     }
 }

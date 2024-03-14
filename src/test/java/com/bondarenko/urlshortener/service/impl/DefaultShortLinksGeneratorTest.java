@@ -9,21 +9,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class DefaultShortLinkGeneratorTest {
+public class DefaultShortLinksGeneratorTest {
 
-    private final DefaultShortLinkGenerator shortLinkGenerator = new DefaultShortLinkGenerator(new AtomicInteger(0), 100);
+    private final DefaultShortLinksGenerator shortLinkGenerator = new DefaultShortLinksGenerator(new AtomicInteger(0), 100);
 
     @Test
     @DisplayName("should generate short link successively with two links batches")
     void shouldGenerateShortLinkSuccessivelyWithTwoLinksBatches() {
 
-        List<String> expectedLinksWithNumbers = List.of("0000", "1000", "2000", "3000", "4000", "5000", "6000", "7000");
-        List<String> expectedLinksWithLowerCaseLetters = List.of("a000", "b000", "c000", "d000", "e000", "f000", "g000");
+        List<String> expectedLinks = List.of("0000", "0001", "0002", "0003", "0004", "0005", "0006", "0007");
 
-        List<String> batchLinksFirst = shortLinkGenerator.generateShortLinks();
+        List<String> actualLinks = shortLinkGenerator.generateShortLinks();
 
-        assertEquals(expectedLinksWithNumbers, batchLinksFirst.subList(0, 8));
-        assertEquals(expectedLinksWithLowerCaseLetters, batchLinksFirst.subList(10, 17));
+        assertEquals(expectedLinks, actualLinks.subList(0, 8));
     }
 
     @Test

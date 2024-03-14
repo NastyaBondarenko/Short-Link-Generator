@@ -1,6 +1,6 @@
 package com.bondarenko.urlshortener.web.controller;
 
-import com.bondarenko.urlshortener.service.ShortLinkGenerator;
+import com.bondarenko.urlshortener.service.ShortLinksGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class ShortLinkControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private ShortLinkGenerator shortLinkGenerator;
+    private ShortLinksGenerator shortLinkGenerator;
 
     @Test
     @DisplayName("should generate short link successfully")
@@ -32,7 +32,7 @@ public class ShortLinkControllerTest {
 
         when(shortLinkGenerator.generateShortLinks()).thenReturn(SHORT_LINKS);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/short-link/generate")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/short-links/generate")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content()

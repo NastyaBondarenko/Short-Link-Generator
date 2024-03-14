@@ -1,12 +1,11 @@
 package com.bondarenko.urlshortener.service.impl;
 
-import com.bondarenko.urlshortener.service.ShortLinkGenerator;
+import com.bondarenko.urlshortener.service.ShortLinksGenerator;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -15,7 +14,7 @@ import java.util.stream.IntStream;
 
 @Service
 @AllArgsConstructor
-public class DefaultShortLinkGenerator implements ShortLinkGenerator {
+public class DefaultShortLinksGenerator implements ShortLinksGenerator {
 
     private static final String LINK_SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final int LINK_MAX_COMBINATIONS = 14_776_336;
@@ -28,26 +27,23 @@ public class DefaultShortLinkGenerator implements ShortLinkGenerator {
     @Override
     public List<String> generateShortLinks() {
 
-        generatedCombinationsCount.compareAndSet(LINK_MAX_COMBINATIONS, 0);//refactor
+        generatedCombinationsCount.compareAndSet(LINK_MAX_COMBINATIONS, 0);
 
         int startIndex = generatedCombinationsCount.get();
         generatedCombinationsCount.compareAndSet(startIndex, startIndex + linksBatchSize);
 
-        List<String> result = new ArrayList<>();
-
-        for (int i = 0; i < linksBatchSize; i++) {
-            result.add(getGeneratedLink(startIndex++));
-        }
-
-        return result;
+        return IntStream.range(0, linksBatchSize)
+                .mapToObj(i -> getGeneratedLink(startIndex + i))
+                .toList();
     }
 
     @VisibleForTesting
     String getGeneratedLink(int valueIndex) {
-        return IntStream.range(LINK_LIMIT_LOWER, LINK_LIMIT_UPPER)
+        return new StringBuilder(IntStream.range(LINK_LIMIT_LOWER, LINK_LIMIT_UPPER)
                 .mapToObj(symbolIndex -> generateLinkSymbol(symbolIndex, valueIndex))
                 .map(String::valueOf)
-                .collect(Collectors.joining());
+                .collect(Collectors.joining()))
+                .reverse().toString();
     }
 
     @VisibleForTesting
